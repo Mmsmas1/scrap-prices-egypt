@@ -63,6 +63,12 @@
 .sr-inp{width:90px;height:36px;border-radius:8px;border:1px solid #3b6cff;background:#0d1529;color:#fff;font:inherit;font-size:16px;padding:0 8px;text-align:center}
 .sr-status{color:#93a0bd;font-size:12px;margin:0 0 14px}.sr-status.err{color:#ff8a8a}
 .sr-reset{margin-top:10px;min-height:40px;padding:0 14px;border-radius:10px;border:1px solid #1f2b4a;background:#111a30;color:#e8edf7;font:inherit;cursor:pointer}
+.sr-tools{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.sr-sel{flex:1;min-width:150px;height:44px;border-radius:12px;border:1px solid #1f2b4a;background:#111a30;color:#e8edf7;font:inherit;font-size:14px;padding:0 10px}
+.sr-csv{min-height:44px;padding:0 16px;border-radius:12px;border:0;background:linear-gradient(135deg,#3b6cff,#7a4dff);color:#fff;font:inherit;font-size:14px;cursor:pointer;box-shadow:0 6px 18px rgba(75,90,255,.35)}
+.sr-chg{display:inline-block;font-size:12px;margin-top:4px;font-variant-numeric:tabular-nums}
+.sr-chg.up{color:#8be28b}.sr-chg.down{color:#ff8a8a}.sr-chg.na{color:#5d6985}
+.sr-when{display:block;font-size:11px;color:#93a0bd;margin-top:2px}
 @media(max-width:760px){.sr-row-price{font-size:17px}}
 </style></head><body><div id="root"></div><script>
 const D=[
@@ -85,6 +91,12 @@ const eff=i=>EDITS[i.id]?EDITS[i.id].v:i.price;
 const priced=()=>ITEMS.filter(i=>eff(i)!=null);
 const P=id=>{const i=ITEMS.find(x=>x.id===id);return eff(i)};
 const TABS=[['home','الرئيسية','◧'],['prices','الأسعار','≣'],['about','المصدر','ⓘ']];
+const HK='scrapReelHist';let HIST={};try{HIST=JSON.parse(localStorage.getItem(HK)||'{}')}catch(e){}
+const saveH=()=>{try{localStorage.setItem(HK,JSON.stringify(HIST))}catch(e){}};
+let sortBy='def';
+const rel=ts=>{const s=Math.max(0,Math.floor((Date.now()-ts)/1000));if(s<60)return 'دلوقتي';if(s<3600)return 'من '+Math.floor(s/60)+' دقيقة';if(s<86400)return 'من '+Math.floor(s/3600)+' ساعة';return 'من '+Math.floor(s/86400)+' يوم'};
+const chgOf=i=>{const h=HIST[i.id];if(!h||h.prev==null||i.price==null||h.prev===i.price)return null;const d=i.price-h.prev;return {d,pct:Math.abs(d/h.prev*100).toFixed(1)}};
+const chgHtml=i=>{if(EDITS[i.id])return '';const c=chgOf(i);if(!c)return '<span class="sr-chg na">— لا تغيير مسجّل</span>';return `<span class="sr-chg ${c.d>0?'up':'down'}">${c.d>0?'▲':'▼'} ${fmt(Math.abs(c.d))} (${c.pct}%)</span><span class=sr-when>${rel(HIST[i.id].ts)}</span>`};
 let tab='home',cat='الكل',q='',editing=null,firstLoad=true;
 const stats=[['نحاس أحمر','cu-red','#ff8a5b'],['نحاس أصفر','cu-yel','#ffc857'],['ألمنيوم طري','al-soft','#5bc0ff'],['حديد خردة مميز','fe-top','#8be28b']];
 const when=t=>t?new Date(t).toLocaleString('ar-EG-u-nu-latn',{weekday:'long',day:'numeric',month:'long',hour:'numeric',minute:'2-digit'}):'غير معروف';
@@ -96,9 +108,12 @@ function view(){
  if(tab==='prices'){
   const cats=['الكل',...new Set(ITEMS.map(i=>i.cat))];
   const l=ITEMS.filter(i=>(cat==='الكل'||i.cat===cat)&&i.name.includes(q.trim()));
+  if(sortBy==='hi')l.sort((x,y)=>(eff(y)??-1)-(eff(x)??-1));
+  if(sortBy==='lo')l.sort((x,y)=>(eff(x)??1e12)-(eff(y)??1e12));
+  if(sortBy==='recent')l.sort((x,y)=>((HIST[y.id]&&HIST[y.id].prev!=null?HIST[y.id].ts:0)||0)-((HIST[x.id]&&HIST[x.id].prev!=null?HIST[x.id].ts:0)||0));
   const ne=Object.keys(EDITS).length;
-  return `<div class=sr-page><div class=sr-hello><h1>كل الأسعار</h1></div>${stat()}<input class=sr-search id=q placeholder="دوّر على صنف" value="${q}"><div class=sr-chips>${cats.map(c=>`<button class="${c===cat?'on':''}" data-c="${c}">${c}</button>`).join('')}</div><div class=sr-list>${l.map((i,n)=>{const p=eff(i),ed=EDITS[i.id];return `<div class="sr-card sr-row" style="animation-delay:${Math.min(n,12)*40}ms"><div><div class=sr-row-name>${i.name}</div><div class=sr-row-cat>${i.cat}</div></div>${editing===i.id?`<div><input class=sr-inp id=ei type=number inputmode=decimal step=any value="${p??''}"> <button class=sr-reset data-save="${i.id}" style="margin:0;min-height:36px">حفظ</button></div>`:`<button class=sr-edit data-e="${i.id}" title="اضغط لتعديل السعر">${p!=null?`<div class=sr-row-price>${fmt(p)}<small> ج/${i.unit}</small>${!ed&&i.hi!=null?`<em>إلى ${fmt(i.hi)}</em>`:''}${ed?'<span class=sr-mod>معدّل من عندك</span>':''}</div>`:`<div class=sr-row-none>من غير سعر · اضغط للتعديل</div>`}</button>`}</div>`}).join('')}</div>${ne?`<button class=sr-reset data-reset>رجّع الأسعار الأصلية (${ne})</button>`:''}</div>`;}
- return `<div class=sr-page><div class=sr-hello><h1>المصدر والتحديث</h1></div><div class="sr-card sr-about"><p><b>المصدر:</b> موقع خردة دوت نت (khurda.net)، موقع تجاري غير رسمي.</p><p><b>نوع السعر:</b> سعر التاجر للكميات من ١٠٠ كيلو فأكتر، واسترشادي.</p><p><b>آخر تحديث للأسعار:</b> ${when(FEED.updated)}</p><p><b>وقت المصدر:</b> ${when(FEED.source_updated)}</p><p>الأسعار بتتحدث تلقائي من GitHub، والصفحة بتفحص كل ٥ دقايق. الأصناف اللي من غير سعر المصدر مش بيسعّرها. تقدر تعدّل أي سعر من تاب الأسعار وبيتحفظ على جهازك لحد ما المصدر يغيّر السعر.</p><p><a href="classic.html" style="color:#8fb0ff">الصفحة القديمة</a></p></div></div>`;
+  return `<div class=sr-page><div class=sr-hello><h1>كل الأسعار</h1></div>${stat()}<input class=sr-search id=q placeholder="دوّر على صنف" value="${q}"><div class=sr-tools><select class=sr-sel id=so aria-label="الترتيب"><option value=def ${sortBy==='def'?'selected':''}>الترتيب الافتراضي</option><option value=hi ${sortBy==='hi'?'selected':''}>الأعلى سعرًا</option><option value=lo ${sortBy==='lo'?'selected':''}>الأقل سعرًا</option><option value=recent ${sortBy==='recent'?'selected':''}>الأحدث تغيّرًا</option></select><button class=sr-csv id=csv>تصدير CSV</button></div><div class=sr-chips>${cats.map(c=>`<button class="${c===cat?'on':''}" data-c="${c}">${c}</button>`).join('')}</div><div class=sr-list>${l.map((i,n)=>{const p=eff(i),ed=EDITS[i.id];return `<div class="sr-card sr-row" style="animation-delay:${Math.min(n,12)*40}ms"><div><div class=sr-row-name>${i.name}</div><div class=sr-row-cat>${i.cat}</div>${p!=null?chgHtml(i):''}</div>${editing===i.id?`<div><input class=sr-inp id=ei type=number inputmode=decimal step=any value="${p??''}"> <button class=sr-reset data-save="${i.id}" style="margin:0;min-height:36px">حفظ</button></div>`:`<button class=sr-edit data-e="${i.id}" title="اضغط لتعديل السعر">${p!=null?`<div class=sr-row-price>${fmt(p)}<small> ج/${i.unit}</small>${!ed&&i.hi!=null?`<em>إلى ${fmt(i.hi)}</em>`:''}${ed?'<span class=sr-mod>معدّل من عندك</span>':''}</div>`:`<div class=sr-row-none>من غير سعر · اضغط للتعديل</div>`}</button>`}</div>`}).join('')}</div>${ne?`<button class=sr-reset data-reset>رجّع الأسعار الأصلية (${ne})</button>`:''}</div>`;}
+ return `<div class=sr-page><div class=sr-hello><h1>المصدر والتحديث</h1></div><div class="sr-card sr-about"><p><b>المصدر:</b> موقع خردة دوت نت (khurda.net)، موقع تجاري غير رسمي.</p><p><b>نوع السعر:</b> سعر التاجر للكميات من ١٠٠ كيلو فأكتر، واسترشادي.</p><p><b>آخر تحديث للأسعار:</b> ${when(FEED.updated)}</p><p><b>وقت المصدر:</b> ${when(FEED.source_updated)}</p><p>الأسعار بتتحدث تلقائي من GitHub، والصفحة بتفحص كل ٥ دقايق. الأصناف اللي من غير سعر المصدر مش بيسعّرها. تقدر تعدّل أي سعر من تاب الأسعار وبيتحفظ على جهازك لحد ما المصدر يغيّر السعر.</p><p>التغير وآخر تغيّر محسوبين على جهازك من أول مرة فتحت فيها الصفحة، وبيظهروا لما المصدر يغيّر سعر.</p><p><a href="classic.html" style="color:#8fb0ff">الصفحة القديمة</a></p></div></div>`;
 }
 function pill(){const el=document.querySelector('.sr-tabs button.on'),p=document.querySelector('.sr-pill'),a=el.parentElement.getBoundingClientRect(),b=el.getBoundingClientRect();p.style.width=b.width+'px';p.style.height=b.height+'px';p.style.transform=`translate(${b.left-a.left}px,${b.top-a.top}px)`}
 function anim(){
@@ -112,6 +127,8 @@ function bind(){
  document.querySelectorAll('[data-save]').forEach(b=>b.onclick=()=>{const id=b.dataset.save,v=document.getElementById('ei').value;const it=ITEMS.find(x=>x.id===id);
    if(v===''){delete EDITS[id]}else{const n=Number(v);if(!isNaN(n)&&n>=0)EDITS[id]={v:n,feed:it.price}}saveE();editing=null;render(true)});
  const ei=document.getElementById('ei');if(ei)ei.onkeydown=e=>{if(e.key==='Enter')document.querySelector('[data-save]').click()};
+ const so=document.getElementById('so');if(so)so.onchange=e=>{sortBy=e.target.value;render(true)};
+ const cv=document.getElementById('csv');if(cv)cv.onclick=csv;
  const r=document.querySelector('[data-reset]');if(r)r.onclick=()=>{EDITS={};saveE();render(true)};
 }
 function render(keepAnim){
@@ -121,6 +138,11 @@ function render(keepAnim){
  document.querySelectorAll('.sr-row').forEach(e=>{if(keepAnim)e.style.animation='none'});
  bind();
 }
+function csv(){
+ const rows=[['المعرّف','القسم','الخامة','الوحدة','السعر','إلى','التغير','آخر تغيّر','السعر معدّل يدويًا'],...ITEMS.map(i=>{const c=chgOf(i),h=HIST[i.id];return [i.id,i.cat,i.name,i.unit,eff(i)??'',i.hi??'',c?c.d:'',c&&h?new Date(h.ts).toISOString():'',EDITS[i.id]?'نعم':'']})];
+ const t='\ufeff'+rows.map(r=>r.map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(',')).join('\n');
+ const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([t],{type:'text/csv;charset=utf-8'}));a.download='scrap-prices.csv';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+}
 async function pull(){
  const urls=['prices.json?t='+Date.now(),'https://raw.githubusercontent.com/Mmsmas1/scrap-prices-egypt/main/prices.json?t='+Date.now()];
  let j=null,err='';
@@ -129,11 +151,12 @@ async function pull(){
  if(!j){FEED.ok=false;FEED.err=err;}else{
   FEED.ok=true;FEED.updated=j.updated;FEED.source_updated=j.source_updated;
   ITEMS.forEach(i=>{const p=j.prices&&j.prices[i.id],h=j.hi&&j.hi[i.id];const np=(p==null||isNaN(Number(p)))?null:Number(p);i.price=np;i.hi=(h==null)?null:Number(h);
-    const e=EDITS[i.id];if(e&&e.feed!==np){delete EDITS[i.id]}});
-  saveE();
+    const e=EDITS[i.id];if(e&&e.feed!==np){delete EDITS[i.id]}
+    if(np!=null){const h=HIST[i.id];if(!h)HIST[i.id]={price:np,prev:null,ts:Date.now()};else if(h.price!==np)HIST[i.id]={price:np,prev:h.price,ts:Date.now()}}});
+  saveE();saveH();
  }
  if(editing)return;
- const sig=JSON.stringify([FEED.ok,FEED.updated,ITEMS.map(i=>i.price)]);
+ const sig=JSON.stringify([FEED.ok,FEED.updated,ITEMS.map(i=>i.price),ITEMS.map(i=>HIST[i.id]&&HIST[i.id].ts)]);
  if(sig!==pull.sig||firstLoad){pull.sig=sig;render(!firstLoad&&tab!=='home'?true:false);}
  firstLoad=false;
 }
