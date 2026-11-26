@@ -1,0 +1,144 @@
+<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#0c1220"><title>لوحة أسعار الخردة في مصر</title><style>html, body, #root { margin: 0; min-height: 100%; background: #0c1220; }
+.sr-app { min-height: 100vh; color: #e8edf7; font-family: system-ui, sans-serif; background: radial-gradient(900px 500px at 85% -10%, #20305a 0%, transparent 60%), #0c1220; display: grid; grid-template-columns: 220px 1fr; }
+.sr-nav { padding: 24px 16px; border-inline-start: 1px solid #1d2742; }
+.sr-logo { font-size: 20px; font-weight: 600; margin-bottom: 24px; padding: 0 12px; }
+.sr-tabs { position: relative; display: flex; flex-direction: column; gap: 6px; }
+.sr-tabs button { position: relative; z-index: 1; display: flex; align-items: center; gap: 10px; min-height: 46px; padding: 0 14px; background: none; border: 0; color: #93a0bd; font: inherit; font-size: 15px; cursor: pointer; border-radius: 12px; transition: color .3s; }
+.sr-tabs button.on { color: #fff; }
+.sr-ico { font-size: 18px; width: 22px; text-align: center; }
+.sr-pill { position: absolute; top: 0; left: 0; z-index: 0; border-radius: 12px; background: linear-gradient(135deg, #3b6cff, #7a4dff); box-shadow: 0 8px 24px rgba(75, 90, 255, .45); transition: transform .5s cubic-bezier(.65, 0, .35, 1), width .5s cubic-bezier(.65, 0, .35, 1), height .5s cubic-bezier(.65, 0, .35, 1); }
+.sr-main { padding: 28px; max-width: 980px; width: 100%; box-sizing: border-box; animation: sr-in .5s cubic-bezier(.2, .7, .2, 1) both; }
+@keyframes sr-in { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+.sr-hello h1 { margin: 0 0 6px; font-size: 26px; font-weight: 600; letter-spacing: 0; }
+.sr-hello p { margin: 0 0 20px; color: #93a0bd; font-size: 14px; line-height: 22px; }
+.sr-card { background: linear-gradient(180deg, #151e36, #111a30); border: 1px solid #1f2b4a; border-radius: 18px; }
+.sr-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 14px; }
+.sr-stat { padding: 18px; position: relative; overflow: hidden; }
+.sr-stat-label { color: #93a0bd; font-size: 13px; }
+.sr-stat-val { font-size: 30px; font-weight: 600; margin-top: 8px; font-variant-numeric: tabular-nums; }
+.sr-stat-val span { font-size: 12px; color: #93a0bd; font-weight: 350; }
+.sr-spark { position: absolute; inset-inline: 0; bottom: 0; height: 4px; background: var(--acc); animation: sr-grow 1s ease both; transform-origin: right; }
+@keyframes sr-grow { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+.sr-chart { padding: 20px; }
+.sr-chart-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 14px; }
+.sr-chart-head h2 { margin: 0; font-size: 17px; font-weight: 600; letter-spacing: 0; }
+.sr-chart-head span { color: #93a0bd; font-size: 12px; }
+.sr-bar-row { display: grid; grid-template-columns: 120px 1fr 56px; gap: 10px; align-items: center; margin: 10px 0; font-size: 13px; }
+.sr-bar-track { background: #0d1529; border-radius: 99px; height: 12px; overflow: hidden; }
+.sr-bar-fill { height: 100%; border-radius: 99px; background: linear-gradient(270deg, #3b6cff, #7a4dff); transition: width 1s cubic-bezier(.2, .8, .2, 1); }
+.sr-bar-num { text-align: start; font-weight: 600; font-variant-numeric: tabular-nums; }
+.sr-search { width: 100%; box-sizing: border-box; height: 46px; border-radius: 12px; border: 1px solid #1f2b4a; background: #111a30; color: #fff; padding: 0 14px; font: inherit; font-size: 15px; margin-bottom: 12px; }
+.sr-chips { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+.sr-chips button { min-height: 40px; padding: 0 14px; border-radius: 99px; border: 1px solid #1f2b4a; background: #111a30; color: #93a0bd; font: inherit; font-size: 13px; cursor: pointer; transition: all .25s; }
+.sr-chips button.on { background: #3b6cff; border-color: #3b6cff; color: #fff; }
+.sr-list { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+.sr-row { padding: 14px 16px; display: flex; justify-content: space-between; align-items: center; gap: 10px; animation: sr-in .45s both; }
+.sr-row-name { font-weight: 600; font-size: 14px; }
+.sr-row-cat { color: #93a0bd; font-size: 12px; margin-top: 2px; }
+.sr-row-price { font-weight: 600; font-size: 18px; text-align: end; white-space: nowrap; }
+.sr-row-price small { font-size: 11px; color: #93a0bd; font-weight: 350; }
+.sr-row-price em { display: block; font-style: normal; font-size: 11px; color: #8be28b; font-weight: 350; }
+.sr-row-none { color: #5d6985; font-size: 13px; }
+.sr-none { color: #93a0bd; padding: 20px; }
+.sr-about { padding: 20px; line-height: 26px; font-size: 14px; }
+.sr-about p { margin: 0 0 10px; }
+.sr-note { color: #ffc857; }
+@media (max-width: 760px) {
+  .sr-app { grid-template-columns: 1fr; }
+  .sr-nav { border: 0; border-bottom: 1px solid #1d2742; padding: 14px 12px; }
+  .sr-logo { margin-bottom: 12px; }
+  .sr-tabs { flex-direction: row; }
+  .sr-tabs button { flex: 1; justify-content: center; padding: 0 8px; font-size: 14px; }
+  .sr-ico { display: none; }
+  .sr-main { padding: 18px 14px 40px; }
+  .sr-stats { grid-template-columns: repeat(2, 1fr); }
+  .sr-stat-val { font-size: 24px; }
+  .sr-bar-row { grid-template-columns: 96px 1fr 44px; font-size: 12px; }
+  .sr-list { grid-template-columns: 1fr; }
+}
+
+.sr-edit{background:none;border:0;color:inherit;font:inherit;cursor:pointer;padding:0;text-align:end}
+.sr-edit:hover{text-decoration:underline dotted}
+.sr-mod{display:block;font-size:11px;color:#ffc857;font-weight:350}
+.sr-inp{width:90px;height:36px;border-radius:8px;border:1px solid #3b6cff;background:#0d1529;color:#fff;font:inherit;font-size:16px;padding:0 8px;text-align:center}
+.sr-status{color:#93a0bd;font-size:12px;margin:0 0 14px}.sr-status.err{color:#ff8a8a}
+.sr-reset{margin-top:10px;min-height:40px;padding:0 14px;border-radius:10px;border:1px solid #1f2b4a;background:#111a30;color:#e8edf7;font:inherit;cursor:pointer}
+@media(max-width:760px){.sr-row-price{font-size:17px}}
+</style></head><body><div id="root"></div><script>
+const D=[
+["fe-mix","حديد","حديد خردة خليط","كيلو"],["fe-top","حديد","حديد خردة مميز","كيلو"],["fe-ton","حديد","حديد خردة","طن"],
+["cu-red","نحاس","نحاس أحمر خردة","كيلو"],["cu-yel","نحاس","نحاس أصفر خردة","كيلو"],
+["al-soft","ألومنيوم","ألمنيوم طري خردة","كيلو"],["al-hard","ألومنيوم","ألمنيوم ناشف خردة","كيلو"],
+["pb","رصاص وبطاريات","رصاص خردة","كيلو"],["bat","رصاص وبطاريات","بطاريات خردة","كيلو"],
+["ss201","استانليس","استانليس 201 خردة","كيلو"],["ss304","استانليس","استانليس 304 خردة","كيلو"],["ss316","استانليس","استانليس 316 خردة","كيلو"],
+["pl","بلاستيك","بلاستيك خردة","كيلو"],
+["ap-fridge","أجهزة كهربائية","ثلاجة خردة","قطعة"],["ap-wash-a","أجهزة كهربائية","غسالة أوتوماتيك خردة","قطعة"],["ap-wash","أجهزة كهربائية","غسالة عادية خردة","قطعة"],["ap-stove","أجهزة كهربائية","بوتاجاز خردة","كيلو"],["ap-heater","أجهزة كهربائية","سخان خردة","كيلو"],["ap-ac","أجهزة كهربائية","تكييف خردة","كيلو"],["ap-fan","أجهزة كهربائية","مراوح خردة","كيلو"],["ap-motor","أجهزة كهربائية","مواتير خردة","كيلو"],
+["el-board","إلكترونيات","بوردة كمبيوتر خردة","كيلو"],["el-ram","إلكترونيات","رامات كمبيوتر خردة","كيلو"],["el-cpu","إلكترونيات","بروسيسور كمبيوتر (سنون) خردة","كيلو"],["el-case","إلكترونيات","كيسة كمبيوتر كاملة خردة","غير محدد"],["el-lap","إلكترونيات","لابتوب كامل خردة","غير محدد"],["el-hdd-l","إلكترونيات","هارد لابتوب خردة","كيلو"],["el-hdd-p","إلكترونيات","هارد كمبيوتر خردة","كيلو"],["el-bat","إلكترونيات","بطاريات لابتوب خردة","كيلو"],["el-ph-k","إلكترونيات","موبايل أزرار خردة","كيلو"],["el-ph-a","إلكترونيات","موبايل أندرويد خردة","كيلو"],["el-ph-b","إلكترونيات","بوردة موبايل خردة","كيلو"]
+];
+const ITEMS=D.map(([id,cat,name,unit])=>({id,cat,name,unit,price:null,hi:null}));
+const fmt=n=>Number(n).toLocaleString('en-US');
+const KEY='scrapReelEdits';
+let EDITS={};try{EDITS=JSON.parse(localStorage.getItem(KEY)||'{}')}catch(e){}
+const saveE=()=>{try{localStorage.setItem(KEY,JSON.stringify(EDITS))}catch(e){}};
+let FEED={updated:null,source_updated:null,ok:false,err:'',checked:0};
+const eff=i=>EDITS[i.id]?EDITS[i.id].v:i.price;
+const priced=()=>ITEMS.filter(i=>eff(i)!=null);
+const P=id=>{const i=ITEMS.find(x=>x.id===id);return eff(i)};
+const TABS=[['home','الرئيسية','◧'],['prices','الأسعار','≣'],['about','المصدر','ⓘ']];
+let tab='home',cat='الكل',q='',editing=null,firstLoad=true;
+const stats=[['نحاس أحمر','cu-red','#ff8a5b'],['نحاس أصفر','cu-yel','#ffc857'],['ألمنيوم طري','al-soft','#5bc0ff'],['حديد خردة مميز','fe-top','#8be28b']];
+const when=t=>t?new Date(t).toLocaleString('ar-EG-u-nu-latn',{weekday:'long',day:'numeric',month:'long',hour:'numeric',minute:'2-digit'}):'غير معروف';
+const stat=()=>FEED.ok?`<p class=sr-status>آخر تحديث للأسعار: ${when(FEED.updated)} · الصفحة بتفحص كل ٥ دقايق</p>`:`<p class="sr-status err">${FEED.checked?'تعذر جلب الأسعار: '+FEED.err:'جاري جلب الأسعار…'}</p>`;
+function view(){
+ if(tab==='home'){
+  const bars=priced().filter(i=>i.unit==='كيلو'&&eff(i)>=40).sort((a,b)=>eff(b)-eff(a)),mx=bars.length?eff(bars[0]):1;
+  return `<div class=sr-page><div class=sr-hello><h1>أسعار الخردة النهارده</h1></div>${stat()}<div class=sr-stats>${stats.map(s=>`<div class="sr-card sr-stat" style="--acc:${s[2]}"><div class=sr-stat-label>${s[0]}</div><div class=sr-stat-val>${P(s[1])!=null?`<b data-n=${P(s[1])}>0</b><span> ج/كيلو</span>`:'<span>من غير سعر</span>'}</div><div class=sr-spark></div></div>`).join('')}</div><div class="sr-card sr-chart"><div class=sr-chart-head><h2>مقارنة الأسعار بالكيلو</h2><span>جنيه مصري</span></div>${bars.map((b,i)=>`<div class=sr-bar-row><div>${b.name.replace(' خردة','')}</div><div class=sr-bar-track><div class=sr-bar-fill data-w=${eff(b)/mx*100} style="transition-delay:${i*70}ms"></div></div><div class=sr-bar-num>${fmt(eff(b))}</div></div>`).join('')}</div></div>`;}
+ if(tab==='prices'){
+  const cats=['الكل',...new Set(ITEMS.map(i=>i.cat))];
+  const l=ITEMS.filter(i=>(cat==='الكل'||i.cat===cat)&&i.name.includes(q.trim()));
+  const ne=Object.keys(EDITS).length;
+  return `<div class=sr-page><div class=sr-hello><h1>كل الأسعار</h1></div>${stat()}<input class=sr-search id=q placeholder="دوّر على صنف" value="${q}"><div class=sr-chips>${cats.map(c=>`<button class="${c===cat?'on':''}" data-c="${c}">${c}</button>`).join('')}</div><div class=sr-list>${l.map((i,n)=>{const p=eff(i),ed=EDITS[i.id];return `<div class="sr-card sr-row" style="animation-delay:${Math.min(n,12)*40}ms"><div><div class=sr-row-name>${i.name}</div><div class=sr-row-cat>${i.cat}</div></div>${editing===i.id?`<div><input class=sr-inp id=ei type=number inputmode=decimal step=any value="${p??''}"> <button class=sr-reset data-save="${i.id}" style="margin:0;min-height:36px">حفظ</button></div>`:`<button class=sr-edit data-e="${i.id}" title="اضغط لتعديل السعر">${p!=null?`<div class=sr-row-price>${fmt(p)}<small> ج/${i.unit}</small>${!ed&&i.hi!=null?`<em>إلى ${fmt(i.hi)}</em>`:''}${ed?'<span class=sr-mod>معدّل من عندك</span>':''}</div>`:`<div class=sr-row-none>من غير سعر · اضغط للتعديل</div>`}</button>`}</div>`}).join('')}</div>${ne?`<button class=sr-reset data-reset>رجّع الأسعار الأصلية (${ne})</button>`:''}</div>`;}
+ return `<div class=sr-page><div class=sr-hello><h1>المصدر والتحديث</h1></div><div class="sr-card sr-about"><p><b>المصدر:</b> موقع خردة دوت نت (khurda.net)، موقع تجاري غير رسمي.</p><p><b>نوع السعر:</b> سعر التاجر للكميات من ١٠٠ كيلو فأكتر، واسترشادي.</p><p><b>آخر تحديث للأسعار:</b> ${when(FEED.updated)}</p><p><b>وقت المصدر:</b> ${when(FEED.source_updated)}</p><p>الأسعار بتتحدث تلقائي من GitHub، والصفحة بتفحص كل ٥ دقايق. الأصناف اللي من غير سعر المصدر مش بيسعّرها. تقدر تعدّل أي سعر من تاب الأسعار وبيتحفظ على جهازك لحد ما المصدر يغيّر السعر.</p><p><a href="classic.html" style="color:#8fb0ff">الصفحة القديمة</a></p></div></div>`;
+}
+function pill(){const el=document.querySelector('.sr-tabs button.on'),p=document.querySelector('.sr-pill'),a=el.parentElement.getBoundingClientRect(),b=el.getBoundingClientRect();p.style.width=b.width+'px';p.style.height=b.height+'px';p.style.transform=`translate(${b.left-a.left}px,${b.top-a.top}px)`}
+function anim(){
+ document.querySelectorAll('[data-n]').forEach(e=>{const t=+e.dataset.n,t0=performance.now();(function f(n){const p=Math.min(1,(n-t0)/900);e.textContent=fmt(Math.round(t*(1-Math.pow(1-p,3))));if(p<1)requestAnimationFrame(f)})(t0)});
+ setTimeout(()=>document.querySelectorAll('[data-w]').forEach(e=>e.style.width=e.dataset.w+'%'),60);
+}
+function bind(){
+ const s=document.getElementById('q');if(s)s.oninput=e=>{q=e.target.value;const pos=q.length;render(true);const n=document.getElementById('q');n.focus();n.setSelectionRange(pos,pos)};
+ document.querySelectorAll('[data-c]').forEach(b=>b.onclick=()=>{cat=b.dataset.c;render()});
+ document.querySelectorAll('[data-e]').forEach(b=>b.onclick=()=>{editing=b.dataset.e;render(true);const x=document.getElementById('ei');if(x){x.focus();x.select()}});
+ document.querySelectorAll('[data-save]').forEach(b=>b.onclick=()=>{const id=b.dataset.save,v=document.getElementById('ei').value;const it=ITEMS.find(x=>x.id===id);
+   if(v===''){delete EDITS[id]}else{const n=Number(v);if(!isNaN(n)&&n>=0)EDITS[id]={v:n,feed:it.price}}saveE();editing=null;render(true)});
+ const ei=document.getElementById('ei');if(ei)ei.onkeydown=e=>{if(e.key==='Enter')document.querySelector('[data-save]').click()};
+ const r=document.querySelector('[data-reset]');if(r)r.onclick=()=>{EDITS={};saveE();render(true)};
+}
+function render(keepAnim){
+ const m=document.getElementById('main');
+ if(!keepAnim){m.style.animation='none';m.offsetHeight;m.style.animation=''}
+ m.innerHTML=view();if(!keepAnim)anim();else document.querySelectorAll('[data-w]').forEach(e=>{e.style.transition='none';e.style.width=e.dataset.w+'%'});
+ document.querySelectorAll('.sr-row').forEach(e=>{if(keepAnim)e.style.animation='none'});
+ bind();
+}
+async function pull(){
+ const urls=['prices.json?t='+Date.now(),'https://raw.githubusercontent.com/Mmsmas1/scrap-prices-egypt/main/prices.json?t='+Date.now()];
+ let j=null,err='';
+ for(const u of urls){try{const r=await fetch(u,{cache:'no-store'});if(!r.ok)throw new Error('حالة '+r.status);j=await r.json();break}catch(e){err=e.message}}
+ FEED.checked=Date.now();
+ if(!j){FEED.ok=false;FEED.err=err;}else{
+  FEED.ok=true;FEED.updated=j.updated;FEED.source_updated=j.source_updated;
+  ITEMS.forEach(i=>{const p=j.prices&&j.prices[i.id],h=j.hi&&j.hi[i.id];const np=(p==null||isNaN(Number(p)))?null:Number(p);i.price=np;i.hi=(h==null)?null:Number(h);
+    const e=EDITS[i.id];if(e&&e.feed!==np){delete EDITS[i.id]}});
+  saveE();
+ }
+ if(editing)return;
+ const sig=JSON.stringify([FEED.ok,FEED.updated,ITEMS.map(i=>i.price)]);
+ if(sig!==pull.sig||firstLoad){pull.sig=sig;render(!firstLoad&&tab!=='home'?true:false);}
+ firstLoad=false;
+}
+document.getElementById('root').innerHTML=`<div class=sr-app><nav class=sr-nav><div class=sr-logo>♻ الخردة</div><div class=sr-tabs><div class=sr-pill></div>${TABS.map(t=>`<button data-t=${t[0]} class="${t[0]===tab?'on':''}"><span class=sr-ico>${t[2]}</span><span>${t[1]}</span></button>`).join('')}</div></nav><main class=sr-main id=main></main></div>`;
+document.querySelectorAll('[data-t]').forEach(b=>b.onclick=()=>{tab=b.dataset.t;editing=null;document.querySelectorAll('[data-t]').forEach(x=>x.classList.toggle('on',x===b));pill();render()});
+render();pill();setTimeout(pill,300);addEventListener('resize',pill);document.fonts&&document.fonts.ready.then(pill);
+pull();setInterval(pull,300000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)pull()});
+</script></body></html>
