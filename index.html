@@ -1,323 +1,144 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>لوحة أسعار الخردة في مصر</title>
-<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
-<style>
-:root{--bg:#e8ebee;--panel:#f7f8f9;--ink:#17252e;--mute:#5d6c76;--line:#cbd2d8;--steel:#33505f;--copper:#b4602f;--up:#1b7a45;--down:#b3261e;--flash:#ffe9a8}
-@media (prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#11181d;--panel:#1a242b;--ink:#e6ecef;--mute:#92a1ab;--line:#2c3a43;--steel:#8fb3c6;--copper:#e08a56;--up:#4cc57f;--down:#ff7a70;--flash:#4a3d12}}
-*{box-sizing:border-box}
-html,body{margin:0}
-body{background:var(--bg);color:var(--ink);font-family:Tajawal,Tahoma,Arial,sans-serif;line-height:1.6;padding:12px}
-.wrap{max-width:1100px;margin:0 auto}
-header{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;align-items:flex-end;margin-bottom:12px}
-h1{font-size:26px;font-weight:800;margin:0}
-.clock{font-size:30px;font-weight:800;font-variant-numeric:tabular-nums;color:var(--copper);direction:ltr}
-.sub{color:var(--mute);font-size:13px}
-.bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:10px;margin-bottom:10px}
-input,select,button{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:4px;padding:6px 10px}
-button{cursor:pointer;background:var(--steel);color:var(--panel);border-color:var(--steel);font-weight:700}
-button.ghost{background:transparent;color:var(--ink);border-color:var(--line)}
-button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--copper);outline-offset:1px}
-#q{flex:1;min-width:160px}
-.chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
-.chip{background:var(--panel);color:var(--ink);border:1px solid var(--line);font-weight:500}
-.chip.on{background:var(--copper);border-color:var(--copper);color:#fff;font-weight:700}
-.tbl{background:var(--panel);border:1px solid var(--line);border-radius:6px;overflow-x:auto}
-table{width:100%;border-collapse:collapse;min-width:720px}
-th,td{padding:9px 12px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap}
-th{font-size:13px;color:var(--mute);font-weight:700;cursor:pointer;user-select:none;position:sticky;top:0;background:var(--panel)}
-tr.cat td{background:var(--bg);font-weight:800;color:var(--steel)}
-td.p input:placeholder-shown{width:140px;font-size:12px}
-td.p input{width:92px;font-weight:700;font-variant-numeric:tabular-nums;text-align:center}
-.chg{font-size:12px;font-variant-numeric:tabular-nums}.up{color:var(--up)}.down{color:var(--down)}
-.na{color:var(--mute);font-size:12px}
-.flash{animation:fl 1.6s}
-@keyframes fl{from{background:var(--flash)}to{background:transparent}}
-@media (max-width:640px){table{min-width:0}th,td{padding:8px 3px;font-size:12px}th:nth-child(2),td:nth-child(2){width:1%}th:nth-child(5),td:nth-child(5),th:nth-child(6),td:nth-child(6){display:none}td.p{white-space:normal}td.p input{width:68px}td.p input:placeholder-shown{width:122px;font-size:10px;padding:4px 2px}td.p .na{display:block;font-size:11px}tr.cat td{display:table-cell}td:nth-child(1){white-space:normal}th:nth-child(4),td:nth-child(4){font-size:11px;padding:8px 2px}.tbl{overflow-x:hidden}}
-@media (prefers-reduced-motion:reduce){.flash{animation:none;background:var(--flash)}}
-details{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:10px;margin-top:10px}
-summary{cursor:pointer;font-weight:700}
-.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:8px}
-code{background:var(--bg);padding:1px 5px;border-radius:3px;direction:ltr;display:inline-block}
-#status{font-size:13px;color:var(--mute)}
-#status.err{color:var(--down)}
-#ptr{position:fixed;top:0;left:0;right:0;text-align:center;padding:8px;background:var(--steel);color:var(--panel);font-weight:700;transform:translateY(-110%);transition:transform .2s;z-index:9}
-#ptr.show{transform:none}
-body{overscroll-behavior-y:contain}
-.last{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:10px 12px;margin-bottom:10px;display:grid;gap:4px;font-size:14px}
-.last b{color:var(--steel)}.last .bad{color:var(--down);font-weight:700}.last .good{color:var(--up);font-weight:700}
-footer{color:var(--mute);font-size:12px;margin-top:10px}
-</style>
-</head>
-<body>
-<div id="ptr" role="status">اسحب لتحديث الأسعار</div>
-<div class="wrap">
-<header>
-  <div>
-    <h1>لوحة أسعار الخردة في مصر</h1>
-    <div class="sub">الأسعار بالجنيه المصري · اسحب الصفحة لأسفل للتحديث · اضغط على أي سعر لتعديله</div>
-  </div>
-  <div style="text-align:left">
-    <div class="clock" id="clock">--:--:--</div>
-    <div class="sub" id="date"></div>
-  </div>
-</header>
+<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#0c1220"><title>لوحة أسعار الخردة في مصر</title><style>html, body, #root { margin: 0; min-height: 100%; background: #0c1220; }
+.sr-app { min-height: 100vh; color: #e8edf7; font-family: system-ui, sans-serif; background: radial-gradient(900px 500px at 85% -10%, #20305a 0%, transparent 60%), #0c1220; display: grid; grid-template-columns: 220px 1fr; }
+.sr-nav { padding: 24px 16px; border-inline-start: 1px solid #1d2742; }
+.sr-logo { font-size: 20px; font-weight: 600; margin-bottom: 24px; padding: 0 12px; }
+.sr-tabs { position: relative; display: flex; flex-direction: column; gap: 6px; }
+.sr-tabs button { position: relative; z-index: 1; display: flex; align-items: center; gap: 10px; min-height: 46px; padding: 0 14px; background: none; border: 0; color: #93a0bd; font: inherit; font-size: 15px; cursor: pointer; border-radius: 12px; transition: color .3s; }
+.sr-tabs button.on { color: #fff; }
+.sr-ico { font-size: 18px; width: 22px; text-align: center; }
+.sr-pill { position: absolute; top: 0; left: 0; z-index: 0; border-radius: 12px; background: linear-gradient(135deg, #3b6cff, #7a4dff); box-shadow: 0 8px 24px rgba(75, 90, 255, .45); transition: transform .5s cubic-bezier(.65, 0, .35, 1), width .5s cubic-bezier(.65, 0, .35, 1), height .5s cubic-bezier(.65, 0, .35, 1); }
+.sr-main { padding: 28px; max-width: 980px; width: 100%; box-sizing: border-box; animation: sr-in .5s cubic-bezier(.2, .7, .2, 1) both; }
+@keyframes sr-in { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+.sr-hello h1 { margin: 0 0 6px; font-size: 26px; font-weight: 600; letter-spacing: 0; }
+.sr-hello p { margin: 0 0 20px; color: #93a0bd; font-size: 14px; line-height: 22px; }
+.sr-card { background: linear-gradient(180deg, #151e36, #111a30); border: 1px solid #1f2b4a; border-radius: 18px; }
+.sr-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 14px; }
+.sr-stat { padding: 18px; position: relative; overflow: hidden; }
+.sr-stat-label { color: #93a0bd; font-size: 13px; }
+.sr-stat-val { font-size: 30px; font-weight: 600; margin-top: 8px; font-variant-numeric: tabular-nums; }
+.sr-stat-val span { font-size: 12px; color: #93a0bd; font-weight: 350; }
+.sr-spark { position: absolute; inset-inline: 0; bottom: 0; height: 4px; background: var(--acc); animation: sr-grow 1s ease both; transform-origin: right; }
+@keyframes sr-grow { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+.sr-chart { padding: 20px; }
+.sr-chart-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 14px; }
+.sr-chart-head h2 { margin: 0; font-size: 17px; font-weight: 600; letter-spacing: 0; }
+.sr-chart-head span { color: #93a0bd; font-size: 12px; }
+.sr-bar-row { display: grid; grid-template-columns: 120px 1fr 56px; gap: 10px; align-items: center; margin: 10px 0; font-size: 13px; }
+.sr-bar-track { background: #0d1529; border-radius: 99px; height: 12px; overflow: hidden; }
+.sr-bar-fill { height: 100%; border-radius: 99px; background: linear-gradient(270deg, #3b6cff, #7a4dff); transition: width 1s cubic-bezier(.2, .8, .2, 1); }
+.sr-bar-num { text-align: start; font-weight: 600; font-variant-numeric: tabular-nums; }
+.sr-search { width: 100%; box-sizing: border-box; height: 46px; border-radius: 12px; border: 1px solid #1f2b4a; background: #111a30; color: #fff; padding: 0 14px; font: inherit; font-size: 15px; margin-bottom: 12px; }
+.sr-chips { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+.sr-chips button { min-height: 40px; padding: 0 14px; border-radius: 99px; border: 1px solid #1f2b4a; background: #111a30; color: #93a0bd; font: inherit; font-size: 13px; cursor: pointer; transition: all .25s; }
+.sr-chips button.on { background: #3b6cff; border-color: #3b6cff; color: #fff; }
+.sr-list { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+.sr-row { padding: 14px 16px; display: flex; justify-content: space-between; align-items: center; gap: 10px; animation: sr-in .45s both; }
+.sr-row-name { font-weight: 600; font-size: 14px; }
+.sr-row-cat { color: #93a0bd; font-size: 12px; margin-top: 2px; }
+.sr-row-price { font-weight: 600; font-size: 18px; text-align: end; white-space: nowrap; }
+.sr-row-price small { font-size: 11px; color: #93a0bd; font-weight: 350; }
+.sr-row-price em { display: block; font-style: normal; font-size: 11px; color: #8be28b; font-weight: 350; }
+.sr-row-none { color: #5d6985; font-size: 13px; }
+.sr-none { color: #93a0bd; padding: 20px; }
+.sr-about { padding: 20px; line-height: 26px; font-size: 14px; }
+.sr-about p { margin: 0 0 10px; }
+.sr-note { color: #ffc857; }
+@media (max-width: 760px) {
+  .sr-app { grid-template-columns: 1fr; }
+  .sr-nav { border: 0; border-bottom: 1px solid #1d2742; padding: 14px 12px; }
+  .sr-logo { margin-bottom: 12px; }
+  .sr-tabs { flex-direction: row; }
+  .sr-tabs button { flex: 1; justify-content: center; padding: 0 8px; font-size: 14px; }
+  .sr-ico { display: none; }
+  .sr-main { padding: 18px 14px 40px; }
+  .sr-stats { grid-template-columns: repeat(2, 1fr); }
+  .sr-stat-val { font-size: 24px; }
+  .sr-bar-row { grid-template-columns: 96px 1fr 44px; font-size: 12px; }
+  .sr-list { grid-template-columns: 1fr; }
+}
 
-<div class="last" id="last" aria-live="polite">
-  <div><b>آخر فحص للأسعار:</b> <span id="lc">لم يتم بعد</span> <span class="sub" id="lcr"></span></div>
-  <div><b>آخر جلب ناجح:</b> <span id="lo">لم يتم بعد</span> <span class="sub" id="lor"></span></div>
-  <div>
-<b>آخر تغيّر فعلي في الأسعار:</b> <span id="lg">لم يحدث بعد</span>
-</div>
-  <div>
-<b>تاريخ تحديث المصدر (khurda.net):</b> <span id="ls">غير معروف</span>
-</div>
-  <div>
-<b>آخر تشغيل لمهمة التحديث:</b> <span id="lj">غير معروف</span>
-</div>
-  <div id="lstate" class="sub">اسحب الصفحة لأسفل لتحديث الأسعار</div>
-</div>
-<div class="bar">
-  <input id="q" type="search" placeholder="ابحث عن خامة، مثل: نحاس أو PET">
-  <select id="sort" aria-label="الترتيب">
-    <option value="def">الترتيب الافتراضي</option>
-    <option value="hi">الأعلى سعراً</option>
-    <option value="lo">الأقل سعراً</option>
-    <option value="recent">الأحدث تغيراً</option>
-  </select>
-  <button id="csv" class="ghost">تصدير CSV</button>
-  <button id="reset" class="ghost">إعادة الأسعار الأصلية</button>
-</div>
-<div class="chips" id="chips"></div>
-
-<div class="tbl"><table>
-  <thead><tr><th>الخامة</th><th>الوحدة</th><th>السعر (جنيه)</th><th>التغير</th><th>آخر تحديث</th><th>المصدر</th></tr></thead>
-  <tbody id="body"></tbody>
-</table></div>
-
-<div id="svc" class="bar" hidden style="margin-top:10px">
-  <input id="svcurl" type="url" placeholder="الصق رابط الخدمة هنا" style="flex:1;min-width:220px;direction:ltr">
-  <button id="svcsave">حفظ</button>
-</div>
-<div id="status" class="sub" style="margin-top:10px">جاري جلب الأسعار من المصدر…</div>
-<footer>الأسعار من موقع خردة دوت نت (khurda.net)، وهو موقع تجاري غير رسمي، وهي أسعار التاجر للكميات من 100 كيلو فأكثر وتقريبية وتختلف حسب المحافظة والكمية. الأصناف المكتوب فيها «السعر حسب الفحص» ليس لها سعر منشور في المصدر. يتم التحديث تلقائياً كل عدة ساعات.</footer>
-</div>
-
-<script>
+.sr-edit{background:none;border:0;color:inherit;font:inherit;cursor:pointer;padding:0;text-align:end}
+.sr-edit:hover{text-decoration:underline dotted}
+.sr-mod{display:block;font-size:11px;color:#ffc857;font-weight:350}
+.sr-inp{width:90px;height:36px;border-radius:8px;border:1px solid #3b6cff;background:#0d1529;color:#fff;font:inherit;font-size:16px;padding:0 8px;text-align:center}
+.sr-status{color:#93a0bd;font-size:12px;margin:0 0 14px}.sr-status.err{color:#ff8a8a}
+.sr-reset{margin-top:10px;min-height:40px;padding:0 14px;border-radius:10px;border:1px solid #1f2b4a;background:#111a30;color:#e8edf7;font:inherit;cursor:pointer}
+@media(max-width:760px){.sr-row-price{font-size:17px}}
+</style></head><body><div id="root"></div><script>
 const D=[
-["fe-mix","حديد","حديد خردة خليط","كيلو",19,"خردة دوت نت","",null],
-["fe-top","حديد","حديد خردة مميز","كيلو",20,"خردة دوت نت","",22],
-["fe-ton","حديد","حديد خردة","طن",null,"لا يتوفر سعر من المصدر","",null],
-["cu-red","نحاس","نحاس أحمر خردة","كيلو",530,"خردة دوت نت","",550],
-["cu-yel","نحاس","نحاس أصفر خردة","كيلو",330,"خردة دوت نت","",null],
-["al-soft","ألومنيوم","ألمنيوم طري خردة","كيلو",140,"خردة دوت نت","",150],
-["al-hard","ألومنيوم","ألمنيوم ناشف خردة","كيلو",80,"خردة دوت نت","",85],
-["pb","رصاص وبطاريات","رصاص خردة","كيلو",70,"خردة دوت نت","",null],
-["bat","رصاص وبطاريات","بطاريات خردة","كيلو",40,"خردة دوت نت","",null],
-["ss201","استانليس","استانليس 201 خردة","كيلو",40,"خردة دوت نت","",null],
-["ss304","استانليس","استانليس 304 خردة","كيلو",75,"خردة دوت نت","",null],
-["ss316","استانليس","استانليس 316 خردة","كيلو",120,"خردة دوت نت","",null],
-["pl","بلاستيك","بلاستيك خردة","كيلو",18,"خردة دوت نت","",18.5],
-["ap-fridge","أجهزة كهربائية","ثلاجة خردة","قطعة",1000,"خردة دوت نت","",3000],
-["ap-wash-a","أجهزة كهربائية","غسالة أوتوماتيك خردة","قطعة",null,"لا يتوفر سعر من المصدر","",null],
-["ap-wash","أجهزة كهربائية","غسالة عادية خردة","قطعة",1000,"خردة دوت نت","",null],
-["ap-stove","أجهزة كهربائية","بوتاجاز خردة","كيلو",null,"لا يتوفر سعر من المصدر","",null],
-["ap-heater","أجهزة كهربائية","سخان خردة","كيلو",null,"لا يتوفر سعر من المصدر","",null],
-["ap-ac","أجهزة كهربائية","تكييف خردة","كيلو",null,"لا يتوفر سعر من المصدر","",null],
-["ap-fan","أجهزة كهربائية","مراوح خردة","كيلو",null,"لا يتوفر سعر من المصدر","",null],
-["ap-motor","أجهزة كهربائية","مواتير خردة","كيلو",55,"خردة دوت نت","",60],
-["el-board","إلكترونيات","بوردة كمبيوتر خردة","كيلو",null,"لا يتوفر سعر من المصدر","",null],
-["el-ram","إلكترونيات","رامات كمبيوتر خردة","كيلو",null,"لا يتوفر سعر من المصدر","",null],
-["el-cpu","إلكترونيات","بروسيسور كمبيوتر (سنون) خردة","كيلو",null,"لا يتوفر سعر من المصدر","",null],
-["el-case","إلكترونيات","كيسة كمبيوتر كاملة خردة","غير محدد",null,"لا يتوفر سعر من المصدر","",null],
-["el-lap","إلكترونيات","لابتوب كامل خردة","غير محدد",null,"لا يتوفر سعر من المصدر","",null],
-["el-hdd-l","إلكترونيات","هارد لابتوب خردة","كيلو",null,"لا يتوفر سعر من المصدر","",null],
-["el-hdd-p","إلكترونيات","هارد كمبيوتر خردة","كيلو",null,"لا يتوفر سعر من المصدر","",null],
-["el-bat","إلكترونيات","بطاريات لابتوب خردة","كيلو",null,"لا يتوفر سعر من المصدر","",null],
-["el-ph-k","إلكترونيات","موبايل أزرار خردة","كيلو",null,"لا يتوفر سعر من المصدر","",null],
-["el-ph-a","إلكترونيات","موبايل أندرويد خردة","كيلو",null,"لا يتوفر سعر من المصدر","",null],
-["el-ph-b","إلكترونيات","بوردة موبايل خردة","كيلو",null,"لا يتوفر سعر من المصدر","",null]
+["fe-mix","حديد","حديد خردة خليط","كيلو"],["fe-top","حديد","حديد خردة مميز","كيلو"],["fe-ton","حديد","حديد خردة","طن"],
+["cu-red","نحاس","نحاس أحمر خردة","كيلو"],["cu-yel","نحاس","نحاس أصفر خردة","كيلو"],
+["al-soft","ألومنيوم","ألمنيوم طري خردة","كيلو"],["al-hard","ألومنيوم","ألمنيوم ناشف خردة","كيلو"],
+["pb","رصاص وبطاريات","رصاص خردة","كيلو"],["bat","رصاص وبطاريات","بطاريات خردة","كيلو"],
+["ss201","استانليس","استانليس 201 خردة","كيلو"],["ss304","استانليس","استانليس 304 خردة","كيلو"],["ss316","استانليس","استانليس 316 خردة","كيلو"],
+["pl","بلاستيك","بلاستيك خردة","كيلو"],
+["ap-fridge","أجهزة كهربائية","ثلاجة خردة","قطعة"],["ap-wash-a","أجهزة كهربائية","غسالة أوتوماتيك خردة","قطعة"],["ap-wash","أجهزة كهربائية","غسالة عادية خردة","قطعة"],["ap-stove","أجهزة كهربائية","بوتاجاز خردة","كيلو"],["ap-heater","أجهزة كهربائية","سخان خردة","كيلو"],["ap-ac","أجهزة كهربائية","تكييف خردة","كيلو"],["ap-fan","أجهزة كهربائية","مراوح خردة","كيلو"],["ap-motor","أجهزة كهربائية","مواتير خردة","كيلو"],
+["el-board","إلكترونيات","بوردة كمبيوتر خردة","كيلو"],["el-ram","إلكترونيات","رامات كمبيوتر خردة","كيلو"],["el-cpu","إلكترونيات","بروسيسور كمبيوتر (سنون) خردة","كيلو"],["el-case","إلكترونيات","كيسة كمبيوتر كاملة خردة","غير محدد"],["el-lap","إلكترونيات","لابتوب كامل خردة","غير محدد"],["el-hdd-l","إلكترونيات","هارد لابتوب خردة","كيلو"],["el-hdd-p","إلكترونيات","هارد كمبيوتر خردة","كيلو"],["el-bat","إلكترونيات","بطاريات لابتوب خردة","كيلو"],["el-ph-k","إلكترونيات","موبايل أزرار خردة","كيلو"],["el-ph-a","إلكترونيات","موبايل أندرويد خردة","كيلو"],["el-ph-b","إلكترونيات","بوردة موبايل خردة","كيلو"]
 ];
-const KEY="scrapBoardV1";
-let S={}; // id -> {price,prev,ts}
-try{S=JSON.parse(localStorage.getItem(KEY)||"{}")}catch(e){S={}}
-const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
-let items=D.map(r=>({id:r[0],cat:r[1],name:r[2],unit:r[3],base:r[4],src:r[5],asof:r[6],hi:r[7]}));
-const cur=i=>S[i.id]&&"price" in S[i.id]?S[i.id].price:i.base;
-const fmt=n=>n==null?"":Number(n).toLocaleString("ar-EG-u-nu-latn");
-let cat="الكل",term="",sortBy="def";
-const $=id=>document.getElementById(id);
-
-function chips(){
-  const cs=["الكل",...new Set(items.map(i=>i.cat))];
-  $("chips").innerHTML=cs.map(c=>`<button class="chip ${c===cat?"on":""}" data-c="${c}">${c}</button>`).join("");
+const ITEMS=D.map(([id,cat,name,unit])=>({id,cat,name,unit,price:null,hi:null}));
+const fmt=n=>Number(n).toLocaleString('en-US');
+const KEY='scrapReelEdits';
+let EDITS={};try{EDITS=JSON.parse(localStorage.getItem(KEY)||'{}')}catch(e){}
+const saveE=()=>{try{localStorage.setItem(KEY,JSON.stringify(EDITS))}catch(e){}};
+let FEED={updated:null,source_updated:null,ok:false,err:'',checked:0};
+const eff=i=>EDITS[i.id]?EDITS[i.id].v:i.price;
+const priced=()=>ITEMS.filter(i=>eff(i)!=null);
+const P=id=>{const i=ITEMS.find(x=>x.id===id);return eff(i)};
+const TABS=[['home','الرئيسية','◧'],['prices','الأسعار','≣'],['about','المصدر','ⓘ']];
+let tab='home',cat='الكل',q='',editing=null,firstLoad=true;
+const stats=[['نحاس أحمر','cu-red','#ff8a5b'],['نحاس أصفر','cu-yel','#ffc857'],['ألمنيوم طري','al-soft','#5bc0ff'],['حديد خردة مميز','fe-top','#8be28b']];
+const when=t=>t?new Date(t).toLocaleString('ar-EG-u-nu-latn',{weekday:'long',day:'numeric',month:'long',hour:'numeric',minute:'2-digit'}):'غير معروف';
+const stat=()=>FEED.ok?`<p class=sr-status>آخر تحديث للأسعار: ${when(FEED.updated)} · الصفحة بتفحص كل ٥ دقايق</p>`:`<p class="sr-status err">${FEED.checked?'تعذر جلب الأسعار: '+FEED.err:'جاري جلب الأسعار…'}</p>`;
+function view(){
+ if(tab==='home'){
+  const bars=priced().filter(i=>i.unit==='كيلو'&&eff(i)>=40).sort((a,b)=>eff(b)-eff(a)),mx=bars.length?eff(bars[0]):1;
+  return `<div class=sr-page><div class=sr-hello><h1>أسعار الخردة النهارده</h1></div>${stat()}<div class=sr-stats>${stats.map(s=>`<div class="sr-card sr-stat" style="--acc:${s[2]}"><div class=sr-stat-label>${s[0]}</div><div class=sr-stat-val>${P(s[1])!=null?`<b data-n=${P(s[1])}>0</b><span> ج/كيلو</span>`:'<span>من غير سعر</span>'}</div><div class=sr-spark></div></div>`).join('')}</div><div class="sr-card sr-chart"><div class=sr-chart-head><h2>مقارنة الأسعار بالكيلو</h2><span>جنيه مصري</span></div>${bars.map((b,i)=>`<div class=sr-bar-row><div>${b.name.replace(' خردة','')}</div><div class=sr-bar-track><div class=sr-bar-fill data-w=${eff(b)/mx*100} style="transition-delay:${i*70}ms"></div></div><div class=sr-bar-num>${fmt(eff(b))}</div></div>`).join('')}</div></div>`;}
+ if(tab==='prices'){
+  const cats=['الكل',...new Set(ITEMS.map(i=>i.cat))];
+  const l=ITEMS.filter(i=>(cat==='الكل'||i.cat===cat)&&i.name.includes(q.trim()));
+  const ne=Object.keys(EDITS).length;
+  return `<div class=sr-page><div class=sr-hello><h1>كل الأسعار</h1></div>${stat()}<input class=sr-search id=q placeholder="دوّر على صنف" value="${q}"><div class=sr-chips>${cats.map(c=>`<button class="${c===cat?'on':''}" data-c="${c}">${c}</button>`).join('')}</div><div class=sr-list>${l.map((i,n)=>{const p=eff(i),ed=EDITS[i.id];return `<div class="sr-card sr-row" style="animation-delay:${Math.min(n,12)*40}ms"><div><div class=sr-row-name>${i.name}</div><div class=sr-row-cat>${i.cat}</div></div>${editing===i.id?`<div><input class=sr-inp id=ei type=number inputmode=decimal step=any value="${p??''}"> <button class=sr-reset data-save="${i.id}" style="margin:0;min-height:36px">حفظ</button></div>`:`<button class=sr-edit data-e="${i.id}" title="اضغط لتعديل السعر">${p!=null?`<div class=sr-row-price>${fmt(p)}<small> ج/${i.unit}</small>${!ed&&i.hi!=null?`<em>إلى ${fmt(i.hi)}</em>`:''}${ed?'<span class=sr-mod>معدّل من عندك</span>':''}</div>`:`<div class=sr-row-none>من غير سعر · اضغط للتعديل</div>`}</button>`}</div>`}).join('')}</div>${ne?`<button class=sr-reset data-reset>رجّع الأسعار الأصلية (${ne})</button>`:''}</div>`;}
+ return `<div class=sr-page><div class=sr-hello><h1>المصدر والتحديث</h1></div><div class="sr-card sr-about"><p><b>المصدر:</b> موقع خردة دوت نت (khurda.net)، موقع تجاري غير رسمي.</p><p><b>نوع السعر:</b> سعر التاجر للكميات من ١٠٠ كيلو فأكتر، واسترشادي.</p><p><b>آخر تحديث للأسعار:</b> ${when(FEED.updated)}</p><p><b>وقت المصدر:</b> ${when(FEED.source_updated)}</p><p>الأسعار بتتحدث تلقائي من GitHub، والصفحة بتفحص كل ٥ دقايق. الأصناف اللي من غير سعر المصدر مش بيسعّرها. تقدر تعدّل أي سعر من تاب الأسعار وبيتحفظ على جهازك لحد ما المصدر يغيّر السعر.</p><p><a href="classic.html" style="color:#8fb0ff">الصفحة القديمة</a></p></div></div>`;
 }
-function rel(ts){
-  const s=Math.max(0,Math.floor((Date.now()-ts)/1000));
-  if(s<60)return `منذ ${s} ثانية`;
-  if(s<3600)return `منذ ${Math.floor(s/60)} دقيقة`;
-  return `منذ ${Math.floor(s/3600)} ساعة`;
+function pill(){const el=document.querySelector('.sr-tabs button.on'),p=document.querySelector('.sr-pill'),a=el.parentElement.getBoundingClientRect(),b=el.getBoundingClientRect();p.style.width=b.width+'px';p.style.height=b.height+'px';p.style.transform=`translate(${b.left-a.left}px,${b.top-a.top}px)`}
+function anim(){
+ document.querySelectorAll('[data-n]').forEach(e=>{const t=+e.dataset.n,t0=performance.now();(function f(n){const p=Math.min(1,(n-t0)/900);e.textContent=fmt(Math.round(t*(1-Math.pow(1-p,3))));if(p<1)requestAnimationFrame(f)})(t0)});
+ setTimeout(()=>document.querySelectorAll('[data-w]').forEach(e=>e.style.width=e.dataset.w+'%'),60);
 }
-function chg(i){
-  const s=S[i.id]; const p=cur(i);
-  const prev=s&&"prev" in s?s.prev:null;
-  if(prev==null||p==null||prev===p)return `<span class="na">—</span>`;
-  const d=p-prev, pct=(d/prev*100).toFixed(1);
-  return `<span class="chg ${d>0?"up":"down"}">${d>0?"▲":"▼"} ${fmt(Math.abs(d))} (${pct}%)</span>`;
+function bind(){
+ const s=document.getElementById('q');if(s)s.oninput=e=>{q=e.target.value;const pos=q.length;render(true);const n=document.getElementById('q');n.focus();n.setSelectionRange(pos,pos)};
+ document.querySelectorAll('[data-c]').forEach(b=>b.onclick=()=>{cat=b.dataset.c;render()});
+ document.querySelectorAll('[data-e]').forEach(b=>b.onclick=()=>{editing=b.dataset.e;render(true);const x=document.getElementById('ei');if(x){x.focus();x.select()}});
+ document.querySelectorAll('[data-save]').forEach(b=>b.onclick=()=>{const id=b.dataset.save,v=document.getElementById('ei').value;const it=ITEMS.find(x=>x.id===id);
+   if(v===''){delete EDITS[id]}else{const n=Number(v);if(!isNaN(n)&&n>=0)EDITS[id]={v:n,feed:it.price}}saveE();editing=null;render(true)});
+ const ei=document.getElementById('ei');if(ei)ei.onkeydown=e=>{if(e.key==='Enter')document.querySelector('[data-save]').click()};
+ const r=document.querySelector('[data-reset]');if(r)r.onclick=()=>{EDITS={};saveE();render(true)};
 }
-function list(){
-  let a=items.filter(i=>(cat==="الكل"||i.cat===cat)&&(!term||(i.name+i.cat).includes(term)));
-  if(sortBy==="hi")a.sort((x,y)=>(cur(y)??-1)-(cur(x)??-1));
-  if(sortBy==="lo")a.sort((x,y)=>(cur(x)??1e12)-(cur(y)??1e12));
-  if(sortBy==="recent")a.sort((x,y)=>((S[y.id]||{}).ts||0)-((S[x.id]||{}).ts||0));
-  return a;
+function render(keepAnim){
+ const m=document.getElementById('main');
+ if(!keepAnim){m.style.animation='none';m.offsetHeight;m.style.animation=''}
+ m.innerHTML=view();if(!keepAnim)anim();else document.querySelectorAll('[data-w]').forEach(e=>{e.style.transition='none';e.style.width=e.dataset.w+'%'});
+ document.querySelectorAll('.sr-row').forEach(e=>{if(keepAnim)e.style.animation='none'});
+ bind();
 }
-function render(){
-  const a=list(); let h="",last="";
-  if(!a.length){$("body").innerHTML=`<tr><td colspan="6" class="na">لا توجد نتائج. غيّر كلمة البحث أو القسم.</td></tr>`;return}
-  a.forEach(i=>{
-    if(sortBy==="def"&&i.cat!==last){h+=`<tr class="cat"><td colspan="6">${i.cat}</td></tr>`;last=i.cat}
-    const p=cur(i), ts=(S[i.id]||{}).ts;
-    h+=`<tr id="r-${i.id}"><td>${i.name}</td><td>${i.unit}</td>
-    <td class="p"><input type="number" min="0" step="any" value="${p==null?"":p}" placeholder="السعر حسب الفحص" data-id="${i.id}" aria-label="سعر ${i.name}">${i.hi?` <span class="na">إلى ${fmt(i.hi)}</span>`:""}</td>
-    <td>${chg(i)}</td>
-    <td class="t" data-ts="${ts||""}" data-asof="${i.asof}">${ts?rel(ts):(i.asof||"<span class='na'>لم يُسجل</span>")}</td>
-    <td>${i.src}</td></tr>`;
-  });
-  $("body").innerHTML=h;
-}
-function setPrice(id,v,fromFeed){
-  const it=items.find(x=>x.id===id); if(!it)return false;
-  const old=cur(it); if(v===old)return false;
-  S[id]={price:v,prev:old,ts:Date.now()}; save(); return true;
-}
-function flash(id){const r=$("r-"+id);if(r){const c=r.querySelector(".p");c.classList.remove("flash");void c.offsetWidth;c.classList.add("flash")}}
-
-$("body").addEventListener("change",e=>{
-  const id=e.target.dataset.id; if(!id)return;
-  const v=e.target.value===""?null:parseFloat(e.target.value);
-  if(v!==null&&(isNaN(v)||v<0)){render();return}
-  const itm=items.find(x=>x.id===id);if(itm)itm.hi=null;
-  if(v===null){delete S[id];save()}else setPrice(id,v);
-  render();flash(id);
-});
-$("chips").addEventListener("click",e=>{const c=e.target.dataset.c;if(c){cat=c;chips();render()}});
-$("q").addEventListener("input",e=>{term=e.target.value.trim();render()});
-$("sort").addEventListener("change",e=>{sortBy=e.target.value;render()});
-$("reset").addEventListener("click",()=>{if(confirm("إعادة كل الأسعار للقيم الأصلية؟ سيتم حذف تعديلاتك.")){S={};save();render()}});
-$("csv").addEventListener("click",()=>{
-  const rows=[["المعرّف","القسم","الخامة","الوحدة","السعر","المصدر"],...items.map(i=>[i.id,i.cat,i.name,i.unit,cur(i)??"",i.src])];
-  const t="\ufeff"+rows.map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(",")).join("\n");
-  const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([t],{type:"text/csv;charset=utf-8"}));
-  a.download="scrap-prices.csv";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);
-});
-
-// المصدر الخارجي
-const SVC_KEY="scrapSvcUrl";
-// رابط ملف الأسعار JSON الثابت (يُملأ بعد اختيار المصدر). إن كان فارغاً تُستخدم الخانة اليدوية.
-const DEFAULT_FEED="https://raw.githubusercontent.com/Mmsmas1/scrap-prices-egypt/main/prices.json";
-function svcUrl(){if(DEFAULT_FEED)return DEFAULT_FEED;try{return localStorage.getItem(SVC_KEY)||""}catch(e){return ""}}
-let feed={secs:300,on:true,left:0,busy:false,stamp:null,srcStamp:null};
-function status(t,err){const s=$("status");s.textContent=t;s.className=err?"err":""}
-
-// ---- تسجيل أوقات الفحص ----
-const LKEY="scrapLastCheck";
-let LAST={check:0,ok:0,chg:0,src:"",msg:"",good:null};
-try{LAST=Object.assign(LAST,JSON.parse(localStorage.getItem(LKEY)||"{}"))}catch(e){}
-const fullDT=ts=>new Date(ts).toLocaleString("ar-EG-u-nu-latn",{weekday:"long",day:"numeric",month:"long",year:"numeric",hour:"numeric",minute:"2-digit",second:"2-digit"});
-function lastShow(){
-  $("lc").textContent=LAST.check?fullDT(LAST.check):"لم يتم بعد";
-  $("lo").textContent=LAST.ok?fullDT(LAST.ok):"لم يتم بعد";
-  $("lg").textContent=LAST.chg?fullDT(LAST.chg):"لم يحدث بعد";
-  $("lj").textContent=LAST.job?new Date(LAST.job).toLocaleString("ar-EG-u-nu-latn"):"غير معروف";
-  $("ls").textContent=LAST.src?new Date(LAST.src).toLocaleString("ar-EG-u-nu-latn"):"غير معروف";
-  const st=$("lstate");
-  if(LAST.good===true){st.className="good";st.textContent="✓ "+LAST.msg}
-  else if(LAST.good===false){st.className="bad";st.textContent="✗ "+LAST.msg}
-}
-function lastRel(){
-  $("lcr").textContent=LAST.check?"("+rel(LAST.check)+")":"";
-  $("lor").textContent=LAST.ok?"("+rel(LAST.ok)+")":"";
-}
-function lastSave(){try{localStorage.setItem(LKEY,JSON.stringify(LAST))}catch(e){}}
-function markCheck(){LAST.check=Date.now();lastSave();lastShow()}
-function markOk(n){LAST.ok=Date.now();if(n)LAST.chg=Date.now();LAST.src=feed.srcStamp||"";LAST.job=feed.stamp||"";LAST.good=true;LAST.msg=n?`تم الجلب، وتغيّر ${n} سعر`:"تم الجلب والأسعار كما هي (لم يتغير أي سعر في المصدر)";lastSave();lastShow()}
-function markFail(m){LAST.good=false;LAST.msg="فشل الجلب: "+m;lastSave();lastShow()}
-
 async function pull(){
-  if(feed.busy)return; feed.busy=true;
-  markCheck();
-  try{
-    const u=svcUrl();
-    if(!u){$("svc").hidden=false;status("الصق رابط الخدمة في الخانة أسفل الجدول ليبدأ التحديث.",true);markFail("لا يوجد رابط خدمة محفوظ، فلا مصدر للأسعار");return}
-    const r=await fetch(u,{cache:"no-store"});
-    if(!r.ok)throw new Error("حالة "+r.status);
-    const j=await r.json();
-    if(j.error)throw new Error(j.error);
-    const pairs=Array.isArray(j)?j.map(o=>[o.id,o.price]):Object.entries(j.prices||j);
-    const ch=[]; let rebuilt=false;
-    if(j.hi)Object.keys(j.hi).forEach(k=>{const it=items.find(x=>x.id===k);if(it&&it.hi!==j.hi[k]){it.hi=j.hi[k];rebuilt=true}});
-    if(Array.isArray(j.extra)&&j.extra.length){
-      const cats=new Set(j.extra.map(x=>x.cat));
-      const before=items.length;
-      items=items.filter(i=>!(cats.has(i.cat)&&i.base==null&&!i.id.startsWith("x-")&&!(S[i.id]&&"price" in S[i.id])));
-      j.extra.forEach(x=>{
-        const id="x-"+x.cat+"-"+x.name;
-        let it=items.find(i=>i.id===id);
-        if(!it){it={id,cat:x.cat,name:x.name,unit:x.unit,base:null,src:"خردة دوت نت",asof:""};items.push(it);rebuilt=true}
-        if(setPrice(id,Number(x.price))) ch.push(id);
-      });
-      if(items.length!==before)rebuilt=true;
-      if(rebuilt){const order=[...new Set(items.map(i=>i.cat))];items.sort((a,b)=>order.indexOf(a.cat)-order.indexOf(b.cat));chips()}
-    }
-    if(j.updated)feed.stamp=j.updated;if(j.source_updated)feed.srcStamp=j.source_updated;
-    pairs.forEach(([id,p])=>{const v=Number(p);if(!isNaN(v)&&setPrice(id,v,true))ch.push(id)});
-    if(ch.length||rebuilt){render();ch.forEach(flash)}
-    const when=feed.stamp?new Date(feed.stamp).toLocaleString("ar-EG-u-nu-latn"):"غير معروف";
-    markOk(ch.length);
-    status(`آخر جلب للأسعار من المصدر: ${when} · الصفحة تفحص كل ${feed.secs} ثواني`);
-  }catch(e){
-    status("تعذر سحب البيانات: "+e.message+". تأكد من رابط الخدمة.",true);
-    markFail(e.message);
-  }finally{feed.busy=false}
+ const urls=['prices.json?t='+Date.now(),'https://raw.githubusercontent.com/Mmsmas1/scrap-prices-egypt/main/prices.json?t='+Date.now()];
+ let j=null,err='';
+ for(const u of urls){try{const r=await fetch(u,{cache:'no-store'});if(!r.ok)throw new Error('حالة '+r.status);j=await r.json();break}catch(e){err=e.message}}
+ FEED.checked=Date.now();
+ if(!j){FEED.ok=false;FEED.err=err;}else{
+  FEED.ok=true;FEED.updated=j.updated;FEED.source_updated=j.source_updated;
+  ITEMS.forEach(i=>{const p=j.prices&&j.prices[i.id],h=j.hi&&j.hi[i.id];const np=(p==null||isNaN(Number(p)))?null:Number(p);i.price=np;i.hi=(h==null)?null:Number(h);
+    const e=EDITS[i.id];if(e&&e.feed!==np){delete EDITS[i.id]}});
+  saveE();
+ }
+ if(editing)return;
+ const sig=JSON.stringify([FEED.ok,FEED.updated,ITEMS.map(i=>i.price)]);
+ if(sig!==pull.sig||firstLoad){pull.sig=sig;render(!firstLoad&&tab!=='home'?true:false);}
+ firstLoad=false;
 }
-
-// نبض كل ثانية
-function tick(){
-  const n=new Date();
-  $("clock").textContent=n.toLocaleTimeString("en-GB");
-  $("date").textContent=n.toLocaleDateString("ar-EG",{weekday:"long",day:"numeric",month:"long",year:"numeric"});
-  lastRel();
-  document.querySelectorAll("td.t").forEach(td=>{const ts=+td.dataset.ts;if(ts)td.textContent=rel(ts)});
-  if(feed.on){if(feed.left<=0){feed.left=feed.secs;pull()}feed.left--}
-}
-status("جاري جلب الأسعار من المصدر…");
-$("svcurl").value=svcUrl();
-$("svcsave").addEventListener("click",()=>{
-  const v=$("svcurl").value.trim();
-  if(!/^https:\/\/script\.google\.com\//.test(v)){status("الرابط لازم يبدأ بـ https://script.google.com/",true);return}
-  try{localStorage.setItem(SVC_KEY,v)}catch(e){}
-  $("svc").hidden=true;feed.left=0;status("تم حفظ الرابط. جاري الجلب…");
-});
-if(!svcUrl())$("svc").hidden=false;
-
-// السحب لأسفل للتحديث
-(function(){
-  let y0=null,dy=0;const p=$("ptr");
-  addEventListener("touchstart",e=>{y0=(scrollY<=0)?e.touches[0].clientY:null;dy=0},{passive:true});
-  addEventListener("touchmove",e=>{if(y0===null)return;dy=e.touches[0].clientY-y0;
-    if(dy>20){p.textContent=dy>80?"اترك للتحديث":"اسحب لتحديث الأسعار";p.classList.add("show")}else p.classList.remove("show")},{passive:true});
-  addEventListener("touchend",async()=>{
-    if(y0!==null&&dy>80){p.textContent="جاري التحديث…";p.classList.add("show");feed.busy=false;
-      try{await pull()}finally{p.textContent=LAST.good?"تم الفحص: "+new Date(LAST.check).toLocaleTimeString("ar-EG-u-nu-latn"):"تعذر التحديث";setTimeout(()=>p.classList.remove("show"),1800)}}
-    else p.classList.remove("show");
-    y0=null;dy=0});
-})();
-lastShow();
-chips();render();tick();setInterval(tick,1000);
-</script>
-</body>
-</html>
+document.getElementById('root').innerHTML=`<div class=sr-app><nav class=sr-nav><div class=sr-logo>♻ الخردة</div><div class=sr-tabs><div class=sr-pill></div>${TABS.map(t=>`<button data-t=${t[0]} class="${t[0]===tab?'on':''}"><span class=sr-ico>${t[2]}</span><span>${t[1]}</span></button>`).join('')}</div></nav><main class=sr-main id=main></main></div>`;
+document.querySelectorAll('[data-t]').forEach(b=>b.onclick=()=>{tab=b.dataset.t;editing=null;document.querySelectorAll('[data-t]').forEach(x=>x.classList.toggle('on',x===b));pill();render()});
+render();pill();setTimeout(pill,300);addEventListener('resize',pill);document.fonts&&document.fonts.ready.then(pill);
+pull();setInterval(pull,300000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)pull()});
+</script></body></html>
